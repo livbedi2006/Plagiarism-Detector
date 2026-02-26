@@ -60,12 +60,12 @@ def predict_plagiarism(text1, text2):
     ])
     
     prediction = model.predict(final_input)[0]
-    
     return prediction, cosine_val
 
 # ------------------ Streamlit UI ------------------
 
-st.title("Plagiarism Detection System")
+st.markdown("<h1 style='text-align: center; color: white;'>🧠 Plagiarism Detection System</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: lightgray;'>Hybrid NLP + TF-IDF Based Detection</p>", unsafe_allow_html=True)
 
 text1 = st.text_area("Enter Original Text")
 text2 = st.text_area("Enter Suspicious Text")
@@ -74,13 +74,48 @@ if st.button("Check Plagiarism"):
     
     if text1 and text2:
         result, similarity = predict_plagiarism(text1, text2)
-        
+
+        st.markdown("---")
+
         if result == 1:
-            st.error("Plagiarized ❌")
+            st.error("🚨 Plagiarized Content Detected!")
         else:
-            st.success("Not Plagiarized ✅")
-        
-        st.write(f"Similarity Score: {similarity*100:.2f}%")
+            st.success("✅ Content Appears Original")
+
+        st.write("### Similarity Score")
+
+        percentage = int(similarity * 100)
+
+        st.progress(percentage)
+        st.write(f"**{percentage}% Similarity**")
     
     else:
         st.warning("Please enter both texts.")
+        st.set_page_config(
+    page_title="Plagiarism Detection System",
+    page_icon="🧠",
+    layout="centered"
+)
+# Custom CSS Styling
+st.markdown("""
+    <style>
+    .main {
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    }
+    .stTextArea textarea {
+        border-radius: 10px;
+        border: 2px solid #4CAF50;
+    }
+    .stButton>button {
+        border-radius: 10px;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 18px;
+        padding: 10px 20px;
+    }
+    .stButton>button:hover {
+        background-color: #45a049;
+        color: white;
+    }
+    </style>
+""", unsafe_allow_html=True)
