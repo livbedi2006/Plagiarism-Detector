@@ -35,18 +35,14 @@ def jaccard_similarity(text1, text2):
     return len(set1 & set2) / len(set1 | set2)
 
 def predict_plagiarism(text1, text2):
-tfidf_1 = word_vectorizer.transform([text1])
-tfidf_2 = word_vectorizer.transform([text2])
-    
+    tfidf_1 = word_vectorizer.transform([text1])
+    tfidf_2 = word_vectorizer.transform([text2])
     char_1 = char_vectorizer.transform([text1])
     char_2 = char_vectorizer.transform([text2])
-    
     jaccard = jaccard_similarity(text1, text2)
     cosine_val = cosine_similarity(tfidf_1, tfidf_2)[0][0]
     length_diff = abs(len(text1) - len(text2))
-    
     extra = np.array([[jaccard, cosine_val, length_diff]])
-    
     final_input = hstack([
         tfidf_1,
         tfidf_2,
@@ -54,7 +50,6 @@ tfidf_2 = word_vectorizer.transform([text2])
         char_2,
         extra
     ])
-    
     prediction = model.predict(final_input)[0]
     return prediction, cosine_val
 
