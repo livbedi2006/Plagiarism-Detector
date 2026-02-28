@@ -8,6 +8,13 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
+# Page configuration (must be first Streamlit command)
+st.set_page_config(
+    page_title="Plagiarism Detection System",
+    page_icon="🧠",
+    layout="centered"
+)
+
 # Load saved model and vectorizers
 model = pickle.load(open("plagiarism_model.pkl", "rb"))
 word_vectorizer = pickle.load(open("word_vectorizer.pkl", "rb"))
@@ -24,7 +31,7 @@ def preprocess(text):
     text = text.lower()
     text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
     words = text.split()
-    words = [lemmatizer.lemmatize(w) for w in words if w not in stop_words]
+    words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words]
     return " ".join(words)
 
 def jaccard_similarity(text1, text2):
@@ -35,13 +42,17 @@ def jaccard_similarity(text1, text2):
     return len(set1 & set2) / len(set1 | set2)
 
 def predict_plagiarism(text1, text2):
-    tfidf_1 = word_vectorizer.transform([text1])
-    tfidf_2 = word_vectorizer.transform([text2])
-    char_1 = char_vectorizer.transform([text1])
-    char_2 = char_vectorizer.transform([text2])
-    jaccard = jaccard_similarity(text1, text2)
+    # Preprocess texts before vectorization
+    processed_text1 = preprocess(text1)
+    processed_text2 = preprocess(text2)
+    
+    tfidf_1 = word_vectorizer.transform([processed_text1])
+    tfidf_2 = word_vectorizer.transform([processed_text2])
+    char_1 = char_vectorizer.transform([processed_text1])
+    char_2 = char_vectorizer.transform([processed_text2])
+    jaccard = jaccard_similarity(processed_text1, processed_text2)
     cosine_val = cosine_similarity(tfidf_1, tfidf_2)[0][0]
-    length_diff = abs(len(text1) - len(text2))
+    length_diff = abs(len(processed_text1) - len(processed_text2))
     extra = np.array([[jaccard, cosine_val, length_diff]])
     final_input = hstack([
         tfidf_1,
@@ -73,20 +84,30 @@ if st.button("Check Plagiarism"):
         else:
             st.success("✅ Content Appears Original")
 
-        st.write("### Similarity Score")
+        st.write("### Similarity Analysis")
 
-        percentage = int(similarity * 100)
+        percentage = round(similarity * 100, 2)
 
-        st.progress(percentage)
-        st.write(f"**{percentage}% Similarity**")
+        # Color code based on similarity level
+        if percentage >= 80:
+            st.error(f"🔴 **{percentage}% Similarity** - High Plagiarism Risk")
+        elif percentage >= 50:
+            st.warning(f"🟡 **{percentage}% Similarity** - Moderate Similarity")
+        else:
+            st.success(f"🟢 **{percentage}% Similarity** - Low Similarity")
+
+        st.progress(percentage / 100)
+        
+        # Additional similarity metrics
+        st.write(f"**Cosine Similarity:** {similarity:.4f}")
+        
+        # Show Jaccard similarity for more insight
+        jaccard_sim = jaccard_similarity(preprocess(text1), preprocess(text2))
+        st.write(f"**Jaccard Similarity:** {jaccard_sim:.4f}")
     
     else:
         st.warning("Please enter both texts.")
-        st.set_page_config(
-    page_title="Plagiarism Detection System",
-    page_icon="🧠",
-    layout="centered"
-)
+
 # Custom CSS Styling
 st.markdown("""
     <style>
