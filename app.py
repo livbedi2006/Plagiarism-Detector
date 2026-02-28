@@ -81,34 +81,31 @@ if st.button("Check Plagiarism"):
 
         percentage = round(similarity * 100, 2)
         
-        # Debug output to see actual values
-        st.write(f"**Debug:** Cosine similarity: {similarity:.6f}, Percentage: {percentage}%")
-        st.write(f"**Debug:** Model prediction: {result}")
+        # Calculate Jaccard similarity for more accurate plagiarism detection
+        jaccard_sim = jaccard_similarity(preprocess(text1), preprocess(text2))
+        jaccard_percentage = round(jaccard_sim * 100, 2)
 
-        # Determine plagiarism based on similarity percentage
-        if percentage >= 50:
+        # Determine plagiarism based on Jaccard similarity (more reliable)
+        if jaccard_percentage >= 50:
             st.error("🚨 Plagiarized Content Detected!")
         else:
             st.success("✅ Content Appears Original")
 
         st.write("### Similarity Analysis")
 
-        # Color code based on similarity level
-        if percentage >= 90:
-            st.error(f"🔴 **{percentage}% Similarity** - High Plagiarism Risk")
-        elif percentage >= 50:
-            st.warning(f"🟡 **{percentage}% Similarity** - Moderate Similarity")
+        # Color code based on Jaccard similarity level
+        if jaccard_percentage >= 90:
+            st.error(f"🔴 **{jaccard_percentage}% Similarity** - High Plagiarism Risk")
+        elif jaccard_percentage >= 50:
+            st.warning(f"🟡 **{jaccard_percentage}% Similarity** - Moderate Similarity")
         else:
-            st.success(f"🟢 **{percentage}% Similarity** - Low Similarity")
+            st.success(f"🟢 **{jaccard_percentage}% Similarity** - Low Similarity")
 
-        st.progress(percentage / 100)
+        st.progress(jaccard_percentage / 100)
         
         # Additional similarity metrics
-        st.write(f"**Cosine Similarity:** {similarity:.4f}")
-        
-        # Show Jaccard similarity for more insight
-        jaccard_sim = jaccard_similarity(preprocess(text1), preprocess(text2))
         st.write(f"**Jaccard Similarity:** {jaccard_sim:.4f}")
+        st.write(f"**Cosine Similarity:** {similarity:.4f}")
     
     else:
         st.warning("Please enter both texts.")
