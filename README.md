@@ -82,7 +82,7 @@ plagiarism_detector/
  
 ## 🎯 Usage
  
-1. Open the application in your browser (usually http://localhost:8501)
+1. Open the application in your browser (usually http://localhost:8501/)
 2. Enter the original text in the first text area
 3. Enter the suspicious text in the second text area
 4. Click "Check Plagiarism" to analyze
