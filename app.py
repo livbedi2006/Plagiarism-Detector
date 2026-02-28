@@ -80,6 +80,10 @@ if st.button("Check Plagiarism"):
         st.markdown("---")
 
         percentage = round(similarity * 100, 2)
+        
+        # Debug output to see actual values
+        st.write(f"**Debug:** Cosine similarity: {similarity:.6f}, Percentage: {percentage}%")
+        st.write(f"**Debug:** Model prediction: {result}")
 
         # Determine plagiarism based on similarity percentage
         if percentage >= 50:
