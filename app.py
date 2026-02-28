@@ -79,14 +79,15 @@ if st.button("Check Plagiarism"):
 
         st.markdown("---")
 
-        if result == 1:
+        percentage = round(similarity * 100, 2)
+
+        # Determine plagiarism based on both model prediction and similarity
+        if result == 1 or percentage >= 50:
             st.error("🚨 Plagiarized Content Detected!")
         else:
             st.success("✅ Content Appears Original")
 
         st.write("### Similarity Analysis")
-
-        percentage = round(similarity * 100, 2)
 
         # Color code based on similarity level
         if percentage >= 80:
